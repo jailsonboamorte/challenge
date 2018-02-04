@@ -30,43 +30,6 @@ use Cake\View\Exception\MissingTemplateException;
  */
 class PagesController extends AppController {
 
-    /**
-     * Displays a view
-     *
-     * @param array ...$path Path segments.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Network\Exception\ForbiddenException When a directory traversal attempt.
-     * @throws \Cake\Network\Exception\NotFoundException When the view file could not
-     *   be found or \Cake\View\Exception\MissingTemplateException in debug mode.
-     */
-    public function display(...$path) {
-        $count = count($path);
-        if (!$count) {
-            return $this->redirect('/');
-        }
-        if (in_array('..', $path, true) || in_array('.', $path, true)) {
-            throw new ForbiddenException();
-        }
-        $page = $subpage = null;
-
-        if (!empty($path[0])) {
-            $page = $path[0];
-        }
-        if (!empty($path[1])) {
-            $subpage = $path[1];
-        }
-        $this->set(compact('page', 'subpage'));
-
-        try {
-            $this->render(implode('/', $path));
-        } catch (MissingTemplateException $exception) {
-            if (Configure::read('debug')) {
-                throw $exception;
-            }
-            throw new NotFoundException();
-        }
-    }
-
     public function home() {
         
     }
@@ -74,7 +37,33 @@ class PagesController extends AppController {
     public function saveRequest() {
         $this->autoRender = false;
         $data['ok'] = true;
-        $data=$this->request->data;
+        $data = $this->request->data;
+        $this->loadModel('Places');
+        $qPla = $this->Places->find('all', ['conditions' => ['Places.code_map' => $data['place_id']]])->first();
+        if (isset($qPla->id)) { // dont find 
+            $idPlace = $qPla->id;
+        } else {
+            $place = $this->Places->newEntity();
+            $place->code_map = $data['place_id'];
+            $place->name = $data['place_name'];
+            if ($this->Places->save($place)) {
+                $idPlace = $place->id;
+            }
+        }
+
+
+        $this->loadModel('Searches');
+        $search = $this->Searches->newEntity();
+        $search->place_id = $idPlace;
+        $search->latitude = $data['lat'];
+        $search->longitude = $data['lon'];
+        $search->radius = $data['radius'];
+        $search->browser = $data['browser'];
+        $search->device = $_SERVER['HTTP_USER_AGENT'];
+
+        $this->Searches->save($search);
+
+
         echo json_encode($data);
     }
 

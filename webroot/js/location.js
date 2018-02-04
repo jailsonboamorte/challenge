@@ -1,8 +1,29 @@
 
-$(document).ready(function () {});
-
+var browser = 'others';
 var lat;
 var lon;
+var map;
+var infowindow;
+var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
+var radius = 500;
+var search;
+
+$(document).ready(function () {});
+function setBrowser() {
+    if (navigator.userAgent.search("MSIE") >= 0) {
+        browser = 'MSIE'
+    } else if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
+        browser = 'Safari'
+    } else if (navigator.userAgent.search("Chrome") >= 0) {
+        browser = 'Chrome'
+    } else if (navigator.userAgent.search("Firefox") >= 0) {
+        browser = 'Firefox'
+    } else if (navigator.userAgent.search("Opera") >= 0) {
+        browser = 'Opera'
+    }
+
+}
+setBrowser();
 
 function getLocation() {
     if (navigator.geolocation) {
@@ -16,34 +37,24 @@ function setPosition(position) {
     lat = position.coords.latitude;
     lon = position.coords.longitude;
     initMap();
-
 }
 
 function showError(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
-            $('#mylocation').html("User denied the request for Geolocation.")
+            $('#error').html("User denied the request for Geolocation.")
             break;
         case error.POSITION_UNAVAILABLE:
-            $('#mylocation').html("Location information is unavailable.")
+            $('#error').html("Location information is unavailable.")
             break;
         case error.TIMEOUT:
-            $('#mylocation').html("The request to get user location timed out.")
+            $('#error').html("The request to get user location timed out.")
             break;
         case error.UNKNOWN_ERROR:
-            $('#mylocation').html("An unknown error occurred.")
+            $('#error').html("An unknown error occurred.")
             break;
     }
 }
-
-//getLocation();
-
-
-
-var map;
-var infowindow;
-var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
-var radius = 500;
 
 function initMap() {
     var pyrmont = {lat: lat, lng: lon};
@@ -54,16 +65,15 @@ function initMap() {
         zoom: 14
     });
 
-
-    new google.maps.Marker({
-        position: latlon, map: map, title: "You are here!"});
+    new google.maps.Marker({position: latlon, map: map, title: "You are here!"});
 
     infowindow = new google.maps.InfoWindow();
     var service = new google.maps.places.PlacesService(map);
     service.nearbySearch({
         location: pyrmont,
         radius: radius,
-        type: ['finance']
+//        query: 'Universidade',
+        type: 'school'
     }, callback);
 }
 
@@ -75,8 +85,6 @@ function callback(results, status) {
     }
 }
 
-var search;
-
 function createMarker(place) {
     place.geometry.location;
     var marker = new google.maps.Marker({
@@ -86,18 +94,15 @@ function createMarker(place) {
     });
 
     google.maps.event.addListener(marker, 'click', function () {
+        console.log(place.id + ' ' + place.name);
         infowindow.setContent(place.name);
         infowindow.open(map, this);
-        search = {place_id: place.id, place_name: place.nome, radius: radius, lat: lat, lon: lon};
+        search = {place_id: place.id, place_name: place.name, radius: radius, lat: lat, lon: lon, browser: browser};
         sendSearch();
     });
 }
 
-/**
- * Comment
- */
 function sendSearch() {
-//    console.log('search: ' + search);
     $.ajax({
         url: "http://localhost/challenge/Pages/save_request",
         type: "POST",
