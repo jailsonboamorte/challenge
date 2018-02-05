@@ -94,10 +94,12 @@ function createMarker(place) {
     });
 
     google.maps.event.addListener(marker, 'click', function () {
-        console.log(place.id + ' ' + place.name);
+        var lat_destino = this.getPosition().lat();
+        var lon_destino = this.getPosition().lng();
         infowindow.setContent(place.name);
         infowindow.open(map, this);
-        search = {place_id: place.id, place_name: place.name, radius: radius, lat: lat, lon: lon, browser: browser};
+        $('#descplace').html(place.name);
+        search = {place_id: place.id, place_name: place.name, radius: radius, lat: lat, lon: lon, browser: browser, lat_destino: lat_destino, lon_destino: lon_destino};
         sendSearch();
     });
 }
@@ -107,6 +109,35 @@ function sendSearch() {
         url: "http://localhost/challenge/Pages/save_request",
         type: "POST",
         data: search,
-        dataType: "json"
+        dataType: "json",
+        beforeSend: function (xhr) {
+            $('#listprice').html('');
+        },
+        success: function (data, textStatus, jqXHR) {
+            $.each(data, function (index, value) {
+                var descUber = value.distance + ' miles' + ', Price: ' + value.estimate + ' by ' + value.type;
+                $('#listprice').append("<li><a class='rideuber' data-uber='" + value.data + "' href='javascript:void(0)'>" + descUber + "</a></li>");
+                // Do something with value here, e.g.                
+            })
+        }
     });
 }
+
+$('body').on('click', '.rideuber', function () {
+    var dados = $(this).data('uber');
+    $.ajax({
+        type: "POST",
+        url: "http://localhost/challenge/Pages/ride_uber",
+        data: dados,        
+        dataType: "json",
+        beforeSend: function (xhr) {
+            $('#ok').addClass('hidden');
+        },
+        success: function (data, textStatus, jqXHR) {
+            $.each(data, function (index, value) {
+                $('#ok').removeClass('hidden');
+                $('#ok').html(value);
+            });
+        }
+    });
+});

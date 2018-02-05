@@ -1,7 +1,9 @@
 <?php
-include('/var/www/html/ChromePHP/ChromePHP.php');
+//require_once('D:\desenvolvimento\ChromePHP\ChromePHP.php');
+//$options = ['useNativeJsonEncode' => false];
+//FB::setOptions($options);
 //FB::setEnabled(true);
-//FB::info('DEBUG HABILITADO !');
+//FB::error('Debug Habilitado');
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
