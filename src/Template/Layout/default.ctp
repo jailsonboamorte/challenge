@@ -20,11 +20,10 @@
 
         <!-- Bootstrap core JavaScript
         ================================================== -->
-        <!-- Placed at the end of the document so the pages load faster -->
-        <?php echo $this->Html->javascript('jquery.min') ?>
-        <?php echo $this->Html->javascript('bootstrap.min') ?>
+        <!-- Placed at the end of the document so the pages load faster -->        
+        <?php echo $this->Html->script('bootstrap.min') ?>
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-        <?php echo $this->Html->javascript('ie-emulation-modes-warning') ?>
+        <?php echo $this->Html->script('ie-emulation-modes-warning') ?>
         <?php echo $this->fetch('script') ?>        
     </body>
 </html>

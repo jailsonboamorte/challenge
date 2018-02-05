@@ -14,7 +14,8 @@
     <?php echo $this->Html->css('ie10-viewport-bug-workaround') ?>
     <?php echo $this->Html->css('starter-template') ?>
 
-    <?php echo $this->Html->javascript('ie-emulation-modes-warning') ?>
+    <?php echo $this->Html->script('jquery.min') ?>
+    <?php echo $this->Html->script('ie-emulation-modes-warning') ?>
 
     <!--[if lt IE 9]-->
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
